@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: dim_leads
+    description: contains leads from salesforce and all other sources
+    columns: 
+      - name: lead_sk
+        description: surrogate key for all leads using a standardized formatting of the phone number and address of the lead
+        tests:
+          - unique:
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">10"
+
