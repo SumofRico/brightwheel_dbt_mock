@@ -1,36 +1,58 @@
 Welcome to my Brightwheel mock dbt project!
 
-## Tradoffs 
 
-- Data clean up
-  - Generally, I would have liked to spend more time on cleaning up fields in the staging layer for easier use in downstream models/reports.
-  - Spending more time on the fields used for the surrogate key (address (street, city, 5-digit zip code) and phone number) would be essential for a production model. Address is complicated to standardize across the data models. An API source to create a standard address would benefit here. Based on my understanding of using phone numbers and addresses, I used the surrogate key to create a standard primary key across the data sources and drive all other models.
-- Confirming incremental model logic work for production models.
-- Adding documentation
-  - Generally speaking, I would typically like to add documentation as I go so it's not a forgotten to-do item.
-- Adding more tests
-  - Adding additional tests on source data and unit tests based on requirements/learnings would be good for a production model.
- 
-## Longer Term ETL Strategies
+# Project Implementation Details
 
-Long term I would like to confirm the ingestion process for the lead source files. Is it required to do on big load each month with new and existing leads? 
-- Is it possible to include a data filter to create better and insert_date of the data > leading to better incremental dbt models.
+## Tradeoffs
 
-I set the dbt project to include Staging, Warehouse, and Mart layers.
-- Staging: 1:1 with raw data with some light transformations (clean-up and additional transformations that don't require a join)
-- Warehouse: meant to house the dim/fct models to build reports for analysts.
-  - Also included are incremental models for the ETL process for sources 1-3. This is more of an intermediate step; it could use refining on where to store long-term. Incremental models set to accept schema changes by adding any new columns, which is good if we expect the source formatting to change.
-- Mart: reporting layer for business teams.
+- **Data Cleaning and Standardization**
+  - With more time, I would have implemented more thorough field cleaning in the staging layer to improve downstream model usability.
+  - The surrogate key implementation using address (street, city, 5-digit zip code) and phone number requires additional refinement for production use. Address standardization is particularly challenging across different data sources—an address standardization API would significantly improve matching accuracy. The current surrogate key approach serves as a functional primary key across data sources but would benefit from further optimization.
 
-Snapshtos were also included for the Salesforce Leads, including history tracking for historical reporting. Good for slowly changing dimensions, could answer how long a lead is a particular status, for example. Snapshots could also be used for the other sources, but initial thoughts are that it would be as much of a benefit -- could configure using column check strategy.
+- **Incremental Model Validation**
+  - Additional testing of incremental model logic would be necessary before deploying to production to ensure proper handling of historical and new data.
 
-## How I explored the data
+- **Documentation**
+  - In a production environment, I would integrate documentation into the development workflow rather than treating it as a separate phase, ensuring comprehensive and up-to-date documentation.
 
-I started scanning the spreadsheet for the type of data available and matching that with the requirements and possible questions we would be trying to answer with said data. I continued to explore as I built the dbt models and considered what would be needed to make the models work well (incremental model requirements, surrogate keys, etc.,). 
+- **Testing Coverage**
+  - The current implementation includes basic tests, but a production model would require expanded test coverage, including source data validation, column-level tests, and business logic validation based on stakeholder requirements.
 
-## Testing, QA, and data validation
+## Longer-Term ETL Strategies
 
-I made the most tradeoff here based on the time requirements. I added some standard tests for this exercise and a simple unit test. In production, I would work closely with stakeholders to determine the testing needed to valdiate the data in addition to standard tests. 
+I would consider revisiting the lead source file ingestion process to answer key questions:
+
+- Is a monthly full load of both new and existing leads necessary, or could we implement a more efficient delta-based approach?
+- Could we enhance the source data with reliable insert/update timestamps to better support incremental processing models?
+
+The project follows a three-layer architecture:
+
+- **Staging Layer**: Provides a 1:1 representation of source data with minimal transformations (type casting, basic cleaning, and field standardization without joins)
+- **Warehouse Layer**: Houses dimensional and fact models (dim_leads, fct_lead_activity) optimized for analytical queries
+  - Includes incremental models for sources 1-3 that accommodate schema changes by automatically incorporating new columns—particularly valuable if source formats evolve over time
+- **Mart Layer**: Contains business-specific reporting models tailored for end-user consumption
+
+## Snapshot Implementation
+
+I implemented snapshots for Salesforce Leads to track historical changes, particularly useful for analyzing lead status duration and other slowly changing dimensions. The snapshot strategy uses timestamp-based.
+
+While snapshots could be implemented for other sources, I would say it has limited benefit compared to the Salesforce data at first glance. If needed, we could implement column-check strategy snapshots for these additional sources.
+
+## Data Exploration Approach
+
+My exploration process involved:
+1. Analyzing source data structure and content to identify key entities and relationships
+2. Mapping available fields to business requirements and potential analytical questions
+3. Iteratively refining the data model as I built dbt models, focusing on surrogate key design, incremental processing requirements, and dimensional modeling best practices
+
+## Testing and Validation
+
+While time constraints limited comprehensive test coverage, I implemented:
+- Standard dbt tests (not_null, unique, referential integrity)
+- A basic unit test for lead classification logic
+
+In a production environment, I would collaborate with stakeholders to develop a more robust testing strategy, including data quality checks, business rule validation, and reconciliation with source systems.
+
 
 ## Anything else
 
