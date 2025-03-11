@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: stg_salesforce__leads
+    description: contains salesforce leads data, built on top of a snapshot
+    columns: 
+      - name: id
+        description: primary key
