@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: sample_data
+    description: leads sampled data
+    schema: raw
+    database: brightwheel
+
+    tables:
+      - name: salesforce_leads
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+      - name: source_one
+      - name: source_two
+      - name: source_three
